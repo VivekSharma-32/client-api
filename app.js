@@ -1,7 +1,13 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
+const connectToDB = require("./src/config/db");
+// load routers
+const userRouter = require("./src/routers/user.router");
+const ticketRouter = require("./src/routers/ticket.router");
+const port = process.env.PORT || 3001;
 
 const app = express();
 
@@ -11,16 +17,14 @@ app.use(helmet());
 // handle cors error
 app.use(cors());
 
-// logger
-app.use(morgan("dev"));
 app.use(express.json());
 
-const port = process.env.PORT || 3001;
-
-// load routers
-const userRouter = require("./src/routers/user.router");
-const ticketRouter = require("./src/routers/ticket.router");
-const e = require("cors");
+// Mongodb Connection setup
+if (process.env.NODE_ENV !== "production") {
+  connectToDB();
+  // logger
+  app.use(morgan("tiny"));
+}
 
 // Use Routers
 app.use("/v1/user", userRouter);
